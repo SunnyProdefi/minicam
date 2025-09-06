@@ -69,7 +69,9 @@ namespace mc
                 if (!opt.has_value())
                     break;
                 Buffer b = std::move(opt.value());
+                LOG_INFO() << "[" << name() << "] dequeued buffer: req=" << b.request_id << " frame=" << b.frame_id;
                 process(b);
+                LOG_INFO() << "[" << name() << "] buffer processed";
             }
         }
 

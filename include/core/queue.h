@@ -16,17 +16,23 @@ public:
             std::lock_guard<std::mutex> lk(m_);
             q_.push_back(std::move(v));
         }
+        LOG_INFO() << "BlockingQueue push exit";
         cv_.notify_one();
     }
 
     std::optional<T> popBlocking(std::atomic_bool& stop_flag)
     {
+        LOG_INFO() << "BlockingQueue pop enter";
         std::unique_lock<std::mutex> lk(m_);
         cv_.wait(lk, [&] { return stop_flag || !q_.empty(); });
         if (stop_flag && q_.empty())
+        {
+            LOG_INFO() << "BlockingQueue pop stop";
             return std::nullopt;
+        }
         T v = std::move(q_.front());
         q_.pop_front();
+        LOG_INFO() << "BlockingQueue pop exit";
         return v;
     }
 
