@@ -1,0 +1,41 @@
+==== Log start at 2025-09-06 18:10:23 ====
+[2025-09-06 18:10:23] [INFO] /home/prodefi/minicam/include/graph/inode.h:29 | Node source opened
+[2025-09-06 18:10:23] [INFO] /home/prodefi/minicam/include/graph/inode.h:29 | Node pack opened
+[2025-09-06 18:10:23] [INFO] /home/prodefi/minicam/include/graph/inode.h:29 | Node sink opened
+[2025-09-06 18:10:23] [INFO] /home/prodefi/minicam/include/service/../graph/executor.h:14 | GraphExecutor adding node: source
+[2025-09-06 18:10:23] [INFO] /home/prodefi/minicam/include/service/../graph/executor.h:14 | GraphExecutor adding node: pack
+[2025-09-06 18:10:23] [INFO] /home/prodefi/minicam/include/service/../graph/executor.h:14 | GraphExecutor adding node: sink
+[2025-09-06 18:10:23] [INFO] /home/prodefi/minicam/include/service/../graph/executor.h:19 | GraphExecutor linking nodes: source -> pack
+[2025-09-06 18:10:23] [INFO] /home/prodefi/minicam/include/graph/inode.h:37 | Node source setting downstream to pack
+[2025-09-06 18:10:23] [INFO] /home/prodefi/minicam/include/service/../graph/executor.h:19 | GraphExecutor linking nodes: pack -> sink
+[2025-09-06 18:10:23] [INFO] /home/prodefi/minicam/include/graph/inode.h:37 | Node pack setting downstream to sink
+[2025-09-06 18:10:23] [INFO] /home/prodefi/minicam/include/graph/inode.h:47 | Node source starting
+[2025-09-06 18:10:23] [INFO] /home/prodefi/minicam/include/graph/inode.h:47 | Node pack starting
+[2025-09-06 18:10:23] [INFO] /home/prodefi/minicam/include/graph/inode.h:64 | [source] thread started
+[2025-09-06 18:10:23] [INFO] /home/prodefi/minicam/include/graph/inode.h:67 | [source] waiting for buffer...
+[2025-09-06 18:10:23] [INFO] /home/prodefi/minicam/include/graph/inode.h:47 | Node sink starting
+[2025-09-06 18:10:23] [INFO] /home/prodefi/minicam/include/graph/inode.h:64 | [pack] thread started
+[2025-09-06 18:10:23] [INFO] /home/prodefi/minicam/include/graph/inode.h:67 | [pack] waiting for buffer...
+[2025-09-06 18:10:23] [INFO] /home/prodefi/minicam/include/graph/inode.h:64 | [sink] thread started
+[2025-09-06 18:10:23] [INFO] /home/prodefi/minicam/include/graph/inode.h:67 | [sink] waiting for buffer...
+[2025-09-06 18:10:23] [INFO] /home/prodefi/minicam/src/service/camera_service.cpp:50 | Camera session opened
+[2025-09-06 18:10:23] [INFO] /home/prodefi/minicam/src/service/camera_service.cpp:80 | submit request 42, async=1
+[2025-09-06 18:10:23] [INFO] /home/prodefi/minicam/src/service/camera_service.cpp:112 | service submit request 42 to source
+[2025-09-06 18:10:23] [INFO] /home/prodefi/minicam/src/nodes/source_node.cpp:23 | SourceNode received request 42
+[2025-09-06 18:10:23] [INFO] /home/prodefi/minicam/src/nodes/source_node.cpp:44 | SourceNode generating 5 frames of 640x480
+[2025-09-06 18:10:23] [INFO] /home/prodefi/minicam/src/nodes/source_node.cpp:69 | source node onBuffer enter
+[2025-09-06 18:10:23] [INFO] /home/prodefi/minicam/include/graph/inode.h:86 | [source] enqueue buffer: req=42 frame=0
+[2025-09-06 18:10:23] [INFO] /home/prodefi/minicam/include/graph/../core/queue.h:14 | BlockingQueue push enter
+[2025-09-06 18:10:23] [INFO] /home/prodefi/minicam/src/nodes/source_node.cpp:69 | source node onBuffer enter
+[2025-09-06 18:10:23] [INFO] /home/prodefi/minicam/include/graph/inode.h:86 | [source] enqueue buffer: req=42 frame=1
+[2025-09-06 18:10:23] [INFO] /home/prodefi/minicam/include/graph/../core/queue.h:14 | BlockingQueue push enter
+[2025-09-06 18:10:24] [INFO] /home/prodefi/minicam/src/nodes/source_node.cpp:69 | source node onBuffer enter
+[2025-09-06 18:10:24] [INFO] /home/prodefi/minicam/include/graph/inode.h:86 | [source] enqueue buffer: req=42 frame=2
+[2025-09-06 18:10:24] [INFO] /home/prodefi/minicam/include/graph/../core/queue.h:14 | BlockingQueue push enter
+[2025-09-06 18:10:24] [INFO] /home/prodefi/minicam/src/nodes/source_node.cpp:69 | source node onBuffer enter
+[2025-09-06 18:10:24] [INFO] /home/prodefi/minicam/include/graph/inode.h:86 | [source] enqueue buffer: req=42 frame=3
+[2025-09-06 18:10:24] [INFO] /home/prodefi/minicam/include/graph/../core/queue.h:14 | BlockingQueue push enter
+[2025-09-06 18:10:24] [INFO] /home/prodefi/minicam/src/nodes/source_node.cpp:69 | source node onBuffer enter
+[2025-09-06 18:10:24] [INFO] /home/prodefi/minicam/include/graph/inode.h:86 | [source] enqueue buffer: req=42 frame=4
+[2025-09-06 18:10:24] [INFO] /home/prodefi/minicam/include/graph/../core/queue.h:14 | BlockingQueue push enter
+[2025-09-06 18:10:24] [INFO] /home/prodefi/minicam/src/nodes/source_node.cpp:64 | SourceNode finished request 42
