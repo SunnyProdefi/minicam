@@ -16,13 +16,30 @@ namespace mc
         std::lock_guard<std::mutex> lk(mtx_);
         console_color_ = console_color;
 
-        // 创建目录
-        if (!log_dir.empty())
+        // 解析日志目录：相对路径统一相对工程根目录
+        fs::path root = fs::current_path();
+        while (!fs::exists(root / "CMakeLists.txt") && root.has_parent_path())
         {
-            fs::create_directories(log_dir);
+            root = root.parent_path();
         }
 
-        logfile_path_ = make_ts_filename(log_dir.empty() ? "." : log_dir, program_name);
+        fs::path dir = log_dir;
+        if (dir.empty())
+        {
+            dir = root;
+        }
+        else if (!dir.is_absolute())
+        {
+            dir = root / dir;
+        }
+
+        // 创建目录
+        if (!dir.empty())
+        {
+            fs::create_directories(dir);
+        }
+
+        logfile_path_ = make_ts_filename(dir.string(), program_name);
         ofs_.open(logfile_path_, std::ios::out | std::ios::app);
         if (!ofs_)
         {
