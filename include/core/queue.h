@@ -3,6 +3,7 @@
 #include <condition_variable>
 #include <deque>
 #include <optional>
+#include <atomic>
 #include "common/log.h"
 
 template <typename T>
@@ -20,12 +21,13 @@ public:
         cv_.notify_one();
     }
 
-    std::optional<T> popBlocking(std::atomic_bool& stop_flag)
+    std::optional<T> popBlocking(std::atomic_bool& running_flag)
     {
         LOG_INFO() << "BlockingQueue pop enter";
         std::unique_lock<std::mutex> lk(m_);
-        cv_.wait(lk, [&] { return stop_flag || !q_.empty(); });
-        if (stop_flag && q_.empty())
+        cv_.wait(lk, [&] { return !running_flag || !q_.empty(); });
+        if (!running_flag && q_.empty())
+
         {
             LOG_INFO() << "BlockingQueue pop stop";
             return std::nullopt;
@@ -40,6 +42,11 @@ public:
     {
         std::lock_guard<std::mutex> lk(m_);
         q_.clear();
+    }
+
+    void notify_all()
+    {
+        cv_.notify_all();
     }
 
 private:

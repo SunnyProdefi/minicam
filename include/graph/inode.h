@@ -8,7 +8,6 @@
 #include <vector>
 #include <memory>
 #include <string>
-#include <condition_variable>
 #include "common/log.h"
 
 namespace mc
@@ -51,7 +50,7 @@ namespace mc
         virtual void stop()
         {
             running_ = false;
-            cv_.notify_all();
+            inq_.notify_all();
             if (th_.joinable())
                 th_.join();
         }
@@ -87,7 +86,6 @@ namespace mc
         {
             LOG_INFO() << "[" << name_ << "] enqueue buffer: req=" << b.request_id << " frame=" << b.frame_id;
             inq_.push(std::move(b));
-            cv_.notify_one();
         }
 
         std::shared_ptr<PipelineBus> bus() const { return bus_; }
@@ -99,7 +97,6 @@ namespace mc
         std::thread th_;
         std::atomic<bool> running_{false};
         BlockingQueue<Buffer> inq_;
-        std::condition_variable cv_;
     };
 
 }  // namespace mc
