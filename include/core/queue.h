@@ -27,6 +27,7 @@ public:
         std::unique_lock<std::mutex> lk(m_);
         cv_.wait(lk, [&] { return !running_flag || !q_.empty(); });
         if (!running_flag && q_.empty())
+
         {
             LOG_INFO() << "BlockingQueue pop stop";
             return std::nullopt;
