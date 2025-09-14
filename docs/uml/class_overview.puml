@@ -1,0 +1,283 @@
+@startuml
+enum "mc::PixelFormat" as C_0002263303045840656977
+enum C_0002263303045840656977 {
+RGBA8888
+GRAY8
+RAW8
+}
+enum "mc::Error" as C_0013625041519183561520
+enum C_0013625041519183561520 {
+OK
+INVALID
+CLOSED
+TIMEOUT
+UNKNOWN
+}
+class "mc::Buffer" as C_0009171545013454044788
+class C_0009171545013454044788 {
+__
++data : std::shared_ptr<std::vector<uint8_t>>
++fmt : PixelFormat
++frame_id : int
++height : int
++request_id : int
++stride : int
++ts : TimePoint
++width : int
+}
+class "mc::BufferPool" as C_0007712890257417083454
+class C_0007712890257417083454 {
++BufferPool(size_t cap, size_t bytes_per_buf) : void
+..
++acquire() : std::shared_ptr<std::vector<uint8_t>>
+__
+-bytes_ : size_t
+-cap_ : size_t
+}
+enum "mc::LogLevel" as C_0002438828622979450295
+enum C_0002438828622979450295 {
+DEBUG
+INFO
+WARN
+ERROR
+}
+class "mc::Logger" as C_0013063711495372386786
+class C_0013063711495372386786 {
+-Logger() = default : void
+-~Logger() : void
+..
+{static} -color_reset() : const char *
++init(const std::string & log_dir = "logs", const std::string & program_name = "minicam", bool console_color = true) : void
+{static} +instance() : Logger &
++level() const : LogLevel
+{static} -level_color(LogLevel lv) : const char *
+{static} -level_to_cstr(LogLevel lv) : const char *
++logfile_path() const : std::string
+-make_ts_filename(const std::string & dir, const std::string & prefix) : std::string
+{static} -now_compact_string() : std::string
+{static} -now_time_string() : std::string
++setLevel(LogLevel lv) : void
++write(LogLevel lv, const char * file, int line, const std::string & text) : void
+__
+-console_color_ : bool
+-logfile_path_ : std::string
+-min_level_ : std::atomic<LogLevel>
+-mtx_ : std::mutex
+-ofs_ : std::ofstream
+}
+class "mc::LogLine" as C_0001661437457430348213
+class C_0001661437457430348213 {
++LogLine(LogLevel lv, const char * file, int line) : void
++~LogLine() : void
+..
++operator<T>(const T & v) : LogLine &
+__
+-file_ : const char *
+-line_ : int
+-lv_ : LogLevel
+-oss_ : std::ostringstream
+}
+class "mc::Settings" as C_0016271119505648103915
+class C_0016271119505648103915 {
+__
++floats : std::map<std::string,float>
++ints : std::map<std::string,int>
+}
+class "mc::StreamConfig" as C_0011106816633775617728
+class C_0011106816633775617728 {
+__
++fmt : PixelFormat
++height : int
++purpose : std::string
++width : int
+}
+class "mc::CaptureRequest" as C_0011453904650235584806
+class C_0011453904650235584806 {
+__
++async : bool
++request_id : int
++settings : Settings
++streams : std::vector<StreamConfig>
+}
+class "mc::CaptureResult" as C_0003790633301303657255
+class C_0003790633301303657255 {
+__
++artifact_path : std::string
++request_id : int
++status : Error
+}
+class "mc::RequestState" as C_0011600526546242901759
+class C_0011600526546242901759 {
+__
++cb : ResultCallback
++remaining : int
+}
+class "mc::PipelineBus" as C_0016594682297027924223
+class C_0016594682297027924223 {
+__
++m : std::mutex
++req : std::unordered_map<int,RequestState>
+}
+class "mc::NodeConfig" as C_0006286502119241324156
+class C_0006286502119241324156 {
+__
++bus : std::shared_ptr<PipelineBus>
++name : std::string
+}
+abstract "mc::INode" as C_0003509329023045814024
+abstract C_0003509329023045814024 {
++~INode() : void
+..
+#bus() const : std::shared_ptr<PipelineBus>
++close() : void
+#enqueue(Buffer b) : void
++name() const : const std::string &
+{abstract} +onBuffer(Buffer buf) = 0 : void
++open(const NodeConfig & cfg) : bool
+{abstract} #process(Buffer & b) = 0 : void
+#pushDown(Buffer b) : void
+#runLoop() : void
++setDownstream(std::shared_ptr<INode> n) : void
++start() : void
++stop() : void
+__
+-bus_ : std::shared_ptr<PipelineBus>
+-downstream_ : std::shared_ptr<INode>
+-inq_ : BlockingQueue<Buffer>
+-name_ : std::string
+-running_ : std::atomic<bool>
+-th_ : std::thread
+}
+class "mc::NodeFactory" as C_0005462687135532756160
+class C_0005462687135532756160 {
++create(const std::string & name) const : std::shared_ptr<INode>
+{static} +instance() : NodeFactory &
++reg(const std::string & name, Creator c) : void
+__
+-creators_ : std::unordered_map<std::string,Creator>
+}
+class "mc::Registrar" as C_0016579010134386172554
+class C_0016579010134386172554 {
++Registrar(const std::string & name, NodeFactory::Creator c) : void
+__
+}
+abstract "mc::ISource" as C_0005542072409888318490
+abstract C_0005542072409888318490 {
++~ISource() = default : void
+..
+{abstract} +onRequest(const CaptureRequest & req, ResultCallback cb) = 0 : void
+__
+}
+class "mc::GraphExecutor" as C_0007936216209441329518
+class C_0007936216209441329518 {
++addNode(const std::shared_ptr<INode> & n) : void
++link(const std::shared_ptr<INode> & up, const std::shared_ptr<INode> & down) : void
++start() : void
++stop() : void
+__
+-nodes_ : std::vector<std::shared_ptr<INode>>
+}
+class "mc::CameraService" as C_0002849512389143462135
+class C_0002849512389143462135 {
+-CameraService() = default : void
+..
++closeSession() : void
+{static} +instance() : CameraService &
++openSession() : bool
++submit(const CaptureRequest & req, ResultCallback cb) : std::future<CaptureResult>
+__
+-bus_ : std::shared_ptr<PipelineBus>
+-exec_ : GraphExecutor
+-m_ : std::mutex
+-opened_ : bool
+-source_iface_ : ISource *
+-source_node_ : std::shared_ptr<INode>
+}
+class "NonCopyable" as C_0003249014624577677817
+class C_0003249014624577677817 {
++NonCopyable() = default : void
++NonCopyable(const NonCopyable &) = deleted : void
+..
++operator=(const NonCopyable &) = deleted : NonCopyable &
+__
+}
+class "BlockingQueue<T>" as C_0007838423220565471269
+class C_0007838423220565471269 {
++clear() : void
++notify_all() : void
++popBlocking(std::atomic_bool & running_flag) : std::optional<T>
++push(T v) : void
+__
+-cv_ : std::condition_variable
+-m_ : std::mutex
+-q_ : std::deque<T>
+}
+class "BlockingQueue<mc::Buffer>" as C_0005628680674035532160
+class C_0005628680674035532160 {
+__
+}
+class "SinkNode" as C_0009540071098556759480
+class C_0009540071098556759480 {
++onBuffer(Buffer buf) : void
+#process(Buffer & b) : void
+__
+}
+class "PackNode" as C_0011069566161062570132
+class C_0011069566161062570132 {
++onBuffer(Buffer buf) : void
+#process(Buffer & b) : void
+__
+}
+class "SourceNode" as C_0001438775150474876560
+class C_0001438775150474876560 {
++onBuffer(Buffer buf) : void
++onRequest(const CaptureRequest & req, ResultCallback cb) : void
++open(const NodeConfig & cfg) : bool
+#process(Buffer & b) : void
+__
+-next_frame_id_ : std::atomic<int>
+}
+C_0009171545013454044788 o-- C_0002263303045840656977 : +fmt
+C_0003249014624577677817 <|-- C_0007712890257417083454
+C_0013063711495372386786 o-- C_0002438828622979450295 : -min_level_
+C_0001661437457430348213 o-- C_0002438828622979450295 : -lv_
+C_0011106816633775617728 o-- C_0002263303045840656977 : +fmt
+C_0011453904650235584806 o-- C_0016271119505648103915 : +settings
+C_0011453904650235584806 o-- C_0011106816633775617728 : +streams
+C_0003790633301303657255 o-- C_0013625041519183561520 : +status
+C_0011600526546242901759 --> C_0003790633301303657255 : +cb
+C_0016594682297027924223 o-- C_0011600526546242901759 : +req
+C_0006286502119241324156 --> C_0016594682297027924223 : +bus
+C_0003509329023045814024 ..> C_0006286502119241324156
+C_0003509329023045814024 ..> C_0009171545013454044788
+C_0003509329023045814024 --> C_0003509329023045814024 : -downstream_
+C_0003509329023045814024 --> C_0016594682297027924223 : -bus_
+C_0003509329023045814024 o-- C_0005628680674035532160 : -inq_
+C_0003249014624577677817 <|-- C_0003509329023045814024
+C_0005462687135532756160 ..> C_0003509329023045814024
+C_0005462687135532756160 ..> C_0003509329023045814024 : -creators_
+C_0005542072409888318490 ..> C_0011453904650235584806
+C_0005542072409888318490 ..> C_0003790633301303657255
+C_0007936216209441329518 o-- C_0003509329023045814024 : -nodes_
+C_0002849512389143462135 ..> C_0011453904650235584806
+C_0002849512389143462135 ..> C_0003790633301303657255
+C_0002849512389143462135 o-- C_0007936216209441329518 : -exec_
+C_0002849512389143462135 --> C_0016594682297027924223 : -bus_
+C_0002849512389143462135 --> C_0003509329023045814024 : -source_node_
+C_0002849512389143462135 --> C_0005542072409888318490 : -source_iface_
+C_0005628680674035532160 ..> C_0009171545013454044788
+C_0005628680674035532160 ..|> C_0007838423220565471269
+C_0009540071098556759480 ..> C_0009171545013454044788
+C_0003509329023045814024 <|-- C_0009540071098556759480
+C_0011069566161062570132 ..> C_0009171545013454044788
+C_0003509329023045814024 <|-- C_0011069566161062570132
+C_0001438775150474876560 ..> C_0006286502119241324156
+C_0001438775150474876560 ..> C_0011453904650235584806
+C_0001438775150474876560 ..> C_0003790633301303657255
+C_0001438775150474876560 ..> C_0009171545013454044788
+C_0003509329023045814024 <|-- C_0001438775150474876560
+C_0005542072409888318490 <|-- C_0001438775150474876560
+
+'Generated with clang-uml, version 0.6.2
+'LLVM version Ubuntu clang version 18.1.3 (1ubuntu1)
+@enduml

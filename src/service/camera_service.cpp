@@ -77,7 +77,6 @@ void CameraService::closeSession()
 
 std::future<CaptureResult> CameraService::submit(const CaptureRequest& req, ResultCallback cb)
 {
-    LOG_INFO() << "submit request " << req.request_id << ", async=" << req.async;
     std::promise<CaptureResult> prom;
     auto fut = prom.get_future();
 
@@ -109,7 +108,6 @@ std::future<CaptureResult> CameraService::submit(const CaptureRequest& req, Resu
         return fut;
     }
 
-    LOG_INFO() << "service submit request " << req.request_id << " to source";
     source_iface_->onRequest(req, wrapped);
     return fut;
 }

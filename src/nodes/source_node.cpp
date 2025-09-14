@@ -20,7 +20,6 @@ public:
 
     void onRequest(const CaptureRequest& req, ResultCallback cb) override
     {
-        LOG_INFO() << "SourceNode received request " << req.request_id;
         int frames = 5;
         auto it = req.settings.ints.find("frames");
         if (it != req.settings.ints.end())
@@ -41,7 +40,6 @@ public:
             h = req.streams[0].height;
         }
 
-        LOG_INFO() << "SourceNode generating " << frames << " frames of " << w << "x" << h;
         for (int i = 0; i < frames; ++i)
         {
             Buffer buf;
@@ -61,23 +59,16 @@ public:
             // 简单节流，模拟硬件帧率
             std::this_thread::sleep_for(std::chrono::milliseconds(5));
         }
-        LOG_INFO() << "SourceNode finished request " << req.request_id;
     }
 
-    void onBuffer(Buffer buf) override
-    {
-        LOG_INFO() << "source node onBuffer enter";
-        enqueue(std::move(buf));
-    }
+    void onBuffer(Buffer buf) override { enqueue(std::move(buf)); }
 
 protected:
     void process(Buffer& b) override
     {
         // 模拟源节点前处理（此处无操作）
         LOG_INFO() << "SOURCE" << "[" << name() << "] processing buffer: req=" << b.request_id << " frame=" << b.frame_id;
-        LOG_INFO() << "source node pushDown enter";
         pushDown(std::move(b));
-        LOG_INFO() << "source node pushDown out";
     }
 
 private:

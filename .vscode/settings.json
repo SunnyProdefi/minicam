@@ -61,7 +61,8 @@
         "typeinfo": "cpp",
         "variant": "cpp",
         "codecvt": "cpp",
-        "iostream": "cpp"
+        "iostream": "cpp",
+        "cinttypes": "cpp"
     },
 
     "logViewer.watch": [

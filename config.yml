@@ -1,0 +1,23 @@
+compilation_database_dir: build
+output_directory: docs/uml
+diagrams:
+  class_overview:
+    type: class
+    glob:
+      - include/**/*.h
+      - src/**/*.cpp
+      - app/**/*.cpp
+    include:
+      paths:
+        - include/**
+        - src/**
+        - app/**
+    exclude:
+      namespaces:
+        - std
+  include_deps:
+    type: include
+    glob:
+      - include/**/*.h
+      - src/**/*.cpp
+      - app/**/*.cpp

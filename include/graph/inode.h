@@ -60,17 +60,13 @@ namespace mc
     protected:
         virtual void runLoop()
         {
-            LOG_INFO() << "[" << name() << "] thread started";
             while (running_)
             {
-                LOG_INFO() << "[" << name() << "] waiting for buffer...";
                 auto opt = inq_.popBlocking(running_);
                 if (!opt.has_value())
                     break;
                 Buffer b = std::move(opt.value());
-                LOG_INFO() << "[" << name() << "] dequeued buffer: req=" << b.request_id << " frame=" << b.frame_id;
                 process(b);
-                LOG_INFO() << "[" << name() << "] buffer processed";
             }
         }
 
@@ -78,13 +74,11 @@ namespace mc
 
         void pushDown(Buffer b)
         {
-            LOG_INFO() << "[" << name_ << "] pushing down buffer: req=" << b.request_id << " frame=" << b.frame_id;
             if (downstream_)
                 downstream_->onBuffer(std::move(b));
         }
         void enqueue(Buffer b)
         {
-            LOG_INFO() << "[" << name_ << "] enqueue buffer: req=" << b.request_id << " frame=" << b.frame_id;
             inq_.push(std::move(b));
         }
 
